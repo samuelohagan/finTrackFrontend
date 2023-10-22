@@ -30,6 +30,7 @@ import {
   Select,
   SimpleGrid,
   useColorModeValue,
+  Skeleton
 } from "@chakra-ui/react";
 // Assets
 import Usa from "assets/img/dashboards/usa.png";
@@ -37,7 +38,7 @@ import Usa from "assets/img/dashboards/usa.png";
 import MiniCalendar from "components/calendar/MiniCalendar";
 import MiniStatistics from "components/card/MiniStatistics";
 import IconBox from "components/icons/IconBox";
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {
   MdAddTask,
   MdAttachMoney,
@@ -57,17 +58,29 @@ import {
 } from "views/admin/default/variables/columnsData";
 import tableDataCheck from "views/admin/default/variables/tableDataCheck.json";
 import tableDataComplex from "views/admin/default/variables/tableDataComplex.json";
+import Cookies from 'js-cookie';
 
 export default function UserReports() {
   // Chakra Color Mode
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+  const [isLoaded, setIsLoaded] = useState(false);
+  const token = Cookies.get('jwtToken');
+
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 2000);
+  }, []);
+
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+      <Skeleton borderRadius="20px" isLoaded={ isLoaded}>
       <SimpleGrid
         columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
         gap='20px'
-        mb='20px'>
+        mb='20px'>       
         <MiniStatistics
           startContent={
             <IconBox
@@ -145,6 +158,7 @@ export default function UserReports() {
           value='2935'
         />
       </SimpleGrid>
+      </Skeleton>
 
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
         <TotalSpent />
@@ -168,5 +182,6 @@ export default function UserReports() {
         </SimpleGrid>
       </SimpleGrid>
     </Box>
+
   );
 }

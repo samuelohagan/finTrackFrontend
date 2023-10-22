@@ -1,0 +1,28 @@
+/* src/App.css */
+.App {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #282c34; /* Dark blue color */
+    color: white;
+    font-size: calc(10px + 2vmin);
+  }
+  
+  .App-header {
+    background-color: transparent; /* No background */
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Add more styles as per your design requirements */
+  

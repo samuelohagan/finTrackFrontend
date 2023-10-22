@@ -21,8 +21,8 @@
 
 */
 
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useContext } from "react";
+import { NavLink, useHistory } from "react-router-dom";
 // Chakra imports
 import {
   Box,
@@ -41,14 +41,20 @@ import {
 } from "@chakra-ui/react";
 // Custom components
 import { HSeparator } from "components/separator/Separator";
+import Cookies from "js-cookie";
 import DefaultAuth from "layouts/auth/Default";
 // Assets
 import illustration from "assets/img/auth/auth.png";
 import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
+import { GoogleLogin } from '@react-oauth/google';
+import { render } from "@testing-library/react";
+import { AuthContext } from "contexts/AuthContext"
+import axios from "axios";
 
 function SignIn() {
+  const history = useHistory();
   // Chakra color mode
   const textColor = useColorModeValue("navy.700", "white");
   const textColorSecondary = "gray.400";
@@ -67,6 +73,33 @@ function SignIn() {
   );
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const clientId = "727089532778-a8692g2ukfbv3gs0qbk2cmo4tat7tqgn.apps.googleusercontent.com";
+  const { setAuth } = useContext(AuthContext);
+  const responseGoogle = (response) => {
+    console.log('login success 2');
+    console.log(response);
+
+    axios.post("/validateGoogleToken", { tokenId: response.credential },
+    {headers: {'Content-Type': 'application/json'}})
+      .then(res => {
+        console.log("backend response", res);
+        Cookies.set('jwtToken', res.data, { expires: 7 });
+        setAuth(true);
+        history.push('/admin');
+      })
+      .catch(err => {
+        console.log("There was an error sending the token to the backend", err);
+      })    
+    // recieving the response from google
+  };
+  const failGoogle = (response) => {
+    console.log('login failed');
+    console.log(response);
+    // recieving the response from google
+  }
+
   return (
     <DefaultAuth illustrationBackground={illustration} image={illustration}>
       <Flex
@@ -104,25 +137,32 @@ function SignIn() {
           mx={{ base: "auto", lg: "unset" }}
           me='auto'
           mb={{ base: "20px", md: "auto" }}>
-          <Button
-            fontSize='sm'
-            me='0px'
-            mb='26px'
-            py='15px'
-            h='50px'
-            borderRadius='16px'
-            bg={googleBg}
-            color={googleText}
-            fontWeight='500'
-            _hover={googleHover}
-            _active={googleActive}
-            _focus={googleActive}>
-            <Icon as={FcGoogle} w='20px' h='20px' me='10px' />
-            Sign in with Google
-          </Button>
+          <GoogleLogin
+            clientId={clientId}
+            buttonText="Login"
+            onSuccess={responseGoogle}
+            onFailure={failGoogle}
+            cookiePolicy={'single_host_origin'}
+            // render={renderProps => (
+            //   <Button onClick={renderProps.onClick} disabled={renderProps.disabled} fontSize='sm'
+            //     me='0px'
+            //     mb='26px'
+            //     py='15px'
+            //     h='50px'
+            //     borderRadius='16px'
+            //     bg={googleBg}
+            //     color={googleText}
+            //     fontWeight='500'
+            //     _hover={googleHover}
+            //     _active={googleActive}
+            //     _focus={googleActive}><Icon as={FcGoogle} w='20px' h='20px' me='10px' />Sign in with Google</Button>
+
+            // )}
+          />
+
           <Flex align='center' mb='25px'>
             <HSeparator />
-            <Text color='gray.400' mx='14px'>
+            <Text color='grGay.400' mx='14px'>
               or
             </Text>
             <HSeparator />
@@ -143,6 +183,8 @@ function SignIn() {
               fontSize='sm'
               ms={{ base: "0px", md: "0px" }}
               type='email'
+              value={email}
+              onChange={(event) => setEmail(event.currentTarget.value)}
               placeholder='mail@simmmple.com'
               mb='24px'
               fontWeight='500'
